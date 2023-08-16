@@ -1,5 +1,5 @@
 # Workflow name
-name: NonProd Workflow
+name: Debug Workflow
 
 # When it will be triggered
 on:
@@ -49,19 +49,19 @@ jobs:
           name: test-reports
           path: build/reports/tests/testDebugUnitTest
 
-      - name:  Build NonProd APK
+      - name:  Build Debug APK
         run: |
-          export NONPROD_BUILD_OFFSET=001
-          export BUILD_NUMBER=$(($GITHUB_RUN_NUMBER + $NONPROD_BUILD_OFFSET))
-          export NONPROD_VERSION=$(git tag --sort=-creatordate | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | head -1)
+          export DEBUG_BUILD_OFFSET=001
+          export BUILD_NUMBER=$(($GITHUB_RUN_NUMBER + $DEBUG_BUILD_OFFSET))
+          export DEBUG_VERSION=$(git tag --sort=-creatordate | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | head -1)
           env | sort
-          ./scripts/package.sh $NONPROD_VERSION $BUILD_NUMBER
+          ./scripts/package.sh $DEBUG_VERSION $BUILD_NUMBER
 
       - name: Save APK Artifact
         uses: actions/upload-artifact@v2
         with:
-          name: nonprod-apk
-          path: build/outputs/apk/nonprod/app-nonprod.apk
+          name: debug-apk
+          path: build/outputs/apk/debug/app-debug.apk
 
       - name: Build debug APK and UI test APK
         run: ./gradlew assembleDebug assembleDebugAndroidTest
@@ -163,10 +163,10 @@ jobs:
           name: test-reports
           path: build/reports/tests/connectedDebugAndroidTest
 
-      - name: Download Acceptance APK
+      - name: Download Debug APK
         uses: actions/download-artifact@v2
         with:
-          name: nonprod-apk
+          name: debug-apk
 
       - name: Installing App Center CLI
         run: npm install -g appcenter-cli
