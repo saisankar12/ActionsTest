@@ -16,4 +16,8 @@ class MainActivityTest {
     fun multiplication() {
         assertEquals(4, 2*2)
     }
+    @Test
+    fun sub() {
+        assertEquals(4, 2-2)
+    }
 }

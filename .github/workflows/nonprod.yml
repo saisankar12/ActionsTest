@@ -23,10 +23,10 @@ jobs:
         with:
           # Number of commits to fetch. 0 indicates all history for all branches and tags.
           fetch-depth: 0
-      - name: Setting up JDK 11
+      - name: Setting up JDK 17
         uses: actions/setup-java@v1
         with:
-          java-version: 11
+          java-version: 17
 
       - name: Installing Android SDK
         uses: android-actions/setup-android@v2
@@ -151,3 +151,40 @@ jobs:
           adb shell settings put global window_animation_scale 0 &
           adb shell settings put global transition_animation_scale 0 &
           adb shell settings put global animator_duration_scale 0 &
+
+      - name: Run UI tests
+        run: |
+          date
+          bash ./gradlew clean
+          bash ./gradlew connectedDebugAndroidTest
+
+      - name: Save Test Reports Artifact
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: test-reports
+          path: build/reports/tests/connectedDebugAndroidTest
+
+      - name: Download Acceptance APK
+        uses: actions/download-artifact@v2
+        with:
+          name: nonprod-apk
+
+      - name: Installing App Center CLI
+        run: npm install -g appcenter-cli
+
+      - name: Upload APK to App Center
+        run: |
+          appcenter distribute release \
+          --token ${{secrets.APPCENTER_API_TOKEN}} \
+          --app saisankar75-gmail.com/ActionsTest \
+          --group Sai-Sankar \
+          --file /Users/runner/work/actionstest/actionstest/app-acceptance.apk \
+          --debug
+
+      - name: Tag last green build
+        run: |
+          export HEAD_HASH=$(git rev-parse --short HEAD)
+          export GREEN_TAG="green-$HEAD_HASH"
+          git tag $GREEN_TAG
+          git push origin $GREEN_TAG
