@@ -47,7 +47,7 @@ jobs:
         if: failure()
         with:
           name: test-reports
-          path: build/reports/tests/testDebugUnitTest
+          path: build/reports/tests/testDebugUnitTest/index.html
 
       - name:  Build Debug APK
         run: |
@@ -161,7 +161,7 @@ jobs:
         if: failure()
         with:
           name: test-reports
-          path: build/reports/tests/connectedDebugAndroidTest
+          path: build/reports/androidTests/connected/debug/index.html
 
       - name: Download Debug APK
         uses: actions/download-artifact@v2
