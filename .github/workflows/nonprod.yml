@@ -1,0 +1,105 @@
+# Workflow name
+name: NonProd Workflow
+
+# When it will be triggered
+on:
+  push:
+    branches:
+      - 'master'
+
+# Where it will run
+jobs:
+  unit-test:
+    runs-on: macos-latest
+    steps:
+      - name: Set TimeZone
+        run: |
+          date
+          sudo unlink /etc/localtime
+          sudo ln -sf /var/db/timezone/zoneinfo/Europe/London /etc/localtime
+          date
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          # Number of commits to fetch. 0 indicates all history for all branches and tags.
+          fetch-depth: 0
+      - name: Setting up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+
+      - name: Installing Android SDK
+        uses: android-actions/setup-android@v2
+
+      # Cache Gradle dependencies and Gradle Wrapper
+      - name: Setup Gradle Cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-${{ hashFiles('**/*.gradle*') }}-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}-${{ hashFiles('**/buildSrc/**/*.kt') }}
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Generate App Version Name
+        run: echo "VERSION_NAME=$(git describe --tags | sed 's/\(.*\)-/\1./' | sed 's/\(.*\)-/\1+/')" >> $GITHUB_ENV
+
+      - name: Bump Version
+        uses: chkfung/android-version-actions@v1.1
+        with:
+          gradlePath: app/build.gradle.kts
+          versionCode: ${{ github.run_number }}
+          versionName: ${{ env.VERSION_NAME }}
+
+      - name: Run Unit Tests
+        run: |
+          date
+          bash ./gradlew clean
+          bash ./gradlew testDebugUnitTest
+
+      - name: Save Test Reports Artifact
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: test-reports
+          path: build/reports/tests/testDebugUnitTest
+
+      - name:  Build NonProd APK
+        run: |
+          export NONPROD_BUILD_OFFSET=001
+          export BUILD_NUMBER=$(($GITHUB_RUN_NUMBER + $NONPROD_BUILD_OFFSET))
+          export NONPROD_VERSION=$(git tag --sort=-creatordate | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | head -1)
+          env | sort
+          ./scripts/package.sh $NONPROD_VERSION $BUILD_NUMBER
+
+      - name: Save APK Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: nonprod-apk
+          path: build/outputs/apk/nonprod/app-nonprod.apk
+
+      - name: Build debug APK and UI test APK
+        run: ./gradlew assembleDebug assembleDebugAndroidTest
+
+      - name: Save debug APK
+        uses: actions/upload-artifact@v2
+        with:
+          name: debug-app-apk
+          path: build/outputs/apk/debug/app-debug.apk
+
+      - name: Save UI tests APK
+        uses: actions/upload-artifact@v2
+        with:
+          name: ui-tests-apk
+          path: build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+
+  ui-tests:
+    runs-on: macos-latest
+    needs: unit-test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1

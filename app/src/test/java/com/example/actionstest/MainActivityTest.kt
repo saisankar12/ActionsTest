@@ -12,4 +12,8 @@ class MainActivityTest {
     fun addition() {
         assertEquals(4, 2+2)
     }
+    @Test
+    fun multiplication() {
+        assertEquals(4, 2*2)
+    }
 }
