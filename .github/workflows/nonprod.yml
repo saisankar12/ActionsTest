@@ -23,6 +23,7 @@ jobs:
         with:
           # Number of commits to fetch. 0 indicates all history for all branches and tags.
           fetch-depth: 0
+
       - name: Setting up JDK 17
         uses: actions/setup-java@v1
         with:
@@ -31,20 +32,8 @@ jobs:
       - name: Installing Android SDK
         uses: android-actions/setup-android@v2
 
-      # Cache Gradle dependencies and Gradle Wrapper
-      - name: Setup Gradle Cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-${{ hashFiles('**/*.gradle*') }}-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}-${{ hashFiles('**/buildSrc/**/*.kt') }}
-
       - name: Make gradlew executable
         run: chmod +x ./gradlew
-
-      - name: Generate App Version Name
-        run: echo "VERSION_NAME=$(git describe --tags | sed 's/\(.*\)-/\1./' | sed 's/\(.*\)-/\1+/')" >> $GITHUB_ENV
 
       - name: Run Unit Tests
         run: |
