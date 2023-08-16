@@ -173,10 +173,10 @@ jobs:
           #name: test-reports
           #path: build/reports/androidTests/connected/debug/index.html
 
-      - name: Download Dev APK
+      - name: Download application APK
         uses: actions/download-artifact@v2
         with:
-          name: dev-apk
+          name: debug-apk
 
       - name: Installing App Center CLI
         run: npm install -g appcenter-cli
