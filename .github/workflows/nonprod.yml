@@ -20,7 +20,7 @@ jobs:
           date
 
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           # Number of commits to fetch. 0 indicates all history for all branches and tags.
           fetch-depth: 0
@@ -83,7 +83,7 @@ jobs:
     needs: unit-test
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 1
 
@@ -179,7 +179,7 @@ jobs:
           name: debug-apk
 
       - name: Installing App Center CLI
-        run: npm install -g appcenter-cli
+        run: npm install -g appcenter-cli@2.13.10
 
       - name: Upload APK to App Center
         run: |
