@@ -175,13 +175,15 @@ jobs:
         run: npm install -g appcenter-cli@2.13.10
 
       - name: Upload APK to App Center
-        run: |
-          appcenter distribute release \
-          --token ${{secrets.APPCENTER_API_TOKEN}} \
-          --app saisankar75/ActionsTest \
-          --groups SaiSankar \
-          --file /Users/runner/work/actionstest/actionstest/app-debug.apk \
-          --debug
+        uses: wzieba/AppCenter-Github-Action@v1
+        with:
+          name: appcenter distribute release
+          token: ${{secrets.APPCENTER_API_TOKEN}}
+          appName: saisankar75/ActionsTest
+          group: SaiSankar
+          file: /Users/runner/work/actionstest/actionstest/app-debug.apk
+          debug: false
+          silent: false
 
       - name: Tag last green build
         run: |
