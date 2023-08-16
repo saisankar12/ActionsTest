@@ -47,7 +47,7 @@ jobs:
         if: failure()
         with:
           name: test-reports
-          path: ./build/reports/tests/testDebugUnitTest/index.html
+          path: app/build/reports/tests/testDebugUnitTest/index.html
 
       - name:  Build Debug APK
         run: |
@@ -61,7 +61,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: debug-apk
-          path: ./build/outputs/apk/debug/app-debug.apk
+          path: app/build/outputs/apk/debug/app-debug.apk
 
       - name: Build debug APK and UI test APK
         run: ./gradlew assembleDebug assembleDebugAndroidTest
@@ -70,13 +70,13 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: debug-app-apk
-          path: ./build/outputs/apk/debug/app-debug.apk
+          path: app/build/outputs/apk/debug/app-debug.apk
 
       - name: Save UI tests APK
         uses: actions/upload-artifact@v2
         with:
           name: ui-tests-apk
-          path: ./build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+          path: app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
 
   ui-tests:
     runs-on: macos-latest
