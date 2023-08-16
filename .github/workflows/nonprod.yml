@@ -166,13 +166,6 @@ jobs:
           bash ./gradlew clean
           bash ./gradlew connectedDebugAndroidTest
 
-      - name: Save UI Test Reports Artifact
-        uses: actions/upload-artifact@v3
-        if: always()
-        with:
-          name: test-reports
-          path: build/reports/androidTests/connected/debug/index.html
-
       - name: Download application APK
         uses: actions/download-artifact@v3
         with:
@@ -186,8 +179,7 @@ jobs:
           appcenter distribute release \
           --token ${{secrets.APPCENTER_API_TOKEN}} \
           --app saisankar75/ActionsTest \
-          --destinations SaiSankar \
-          --destination_type store \
+          --groups SaiSankar \
           --file /Users/runner/work/actionstest/actionstest/app-debug.apk \
           --debug
 
