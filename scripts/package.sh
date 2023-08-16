@@ -17,4 +17,4 @@ if [[ -z "CODE" ]]; then
     exit 1
 fi
 
-./gradlew assembleNonprod -PreviousName=${VERSION} -PreviousCode=${CODE}
+./gradlew assembleDebug -PreviousName=${VERSION} -PreviousCode=${CODE}
