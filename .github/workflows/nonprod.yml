@@ -43,8 +43,8 @@ jobs:
           bash ./gradlew testDebugUnitTest
 
       - name: Save Test Reports Artifact
-        uses: actions/upload-artifact@v2
-        if: failure()
+        uses: actions/upload-artifact@v3
+        if: always()
         with:
           name: test-reports
           path: app/build/reports/tests/testDebugUnitTest/index.html
@@ -185,8 +185,8 @@ jobs:
         run: |
           appcenter distribute release \
           --token ${{secrets.APPCENTER_API_TOKEN}} \
-          --app saisankar75-gmail.com/ActionsTest \
-          --group Sai-Sankar \
+          --app saisankar75/ActionsTest \
+          --group SaiSankar \
           --file /Users/runner/work/actionstest/actionstest/app-debug.apk \
           --debug
 
