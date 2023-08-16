@@ -46,13 +46,6 @@ jobs:
       - name: Generate App Version Name
         run: echo "VERSION_NAME=$(git describe --tags | sed 's/\(.*\)-/\1./' | sed 's/\(.*\)-/\1+/')" >> $GITHUB_ENV
 
-      - name: Bump Version
-        uses: chkfung/android-version-actions@v1.1
-        with:
-          gradlePath: app/build.gradle.kts
-          versionCode: ${{ github.run_number }}
-          versionName: ${{ env.VERSION_NAME }}
-
       - name: Run Unit Tests
         run: |
           date
@@ -103,3 +96,58 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 1
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v2
+
+      - name: Setup gradle
+        uses: gradle/gradle-build-action@v2
+
+      - name: Create Android emulator
+        run: |
+          sdkmanager --install "system-images;android-25;default;x86"
+          echo "no" | avdmanager --verbose create avd --force --name TestAvd -d pixel --abi default/x86 --package 'system-images;android-25;default;x86'
+          
+          if false; then
+          emulator_config=/Users/runner/.android/emu-update-last-check.ini
+          # The following madness is to support empty OR populated config.ini files,
+          # the state of which is dependant on the version of the emulator used (which we don't control),
+          # so let's be defensive to be safe.
+          # Replace existing config (NOTE we're on MacOS so sed works differently!)
+          sed -i .bak 's/hw.lcd.density=.*/hw.lcd.density=420/' "$emulator_config"
+          sed -i .bak 's/hw.lcd.height=.*/hw.lcd.height=1920/' "$emulator_config"
+          sed -i .bak 's/hw.lcd.width=.*/hw.lcd.width=1080/' "$emulator_config"
+          # Or, add new config
+          
+          if ! grep -q "hw.lcd.density" "$emulator_config"; then
+          echo "hw.lcd.density=420" >> "$emulator_config"
+          fi
+          
+          if ! grep -q "hw.lcd.height" "$emulator_config"; then
+          echo "hw.lcd.height=1920" >> "$emulator_config"
+          fi
+          
+          if ! grep -q "hw.lcd.width" "$emulator_config"; then
+          echo "hw.lcd.width=1080" >> "$emulator_config"
+          fi
+          echo "Emulator settings ($emulator_config)"
+          cat "$emulator_config"
+          fi
+
+      - name: Start android emulator
+        run: |
+          echo "Starting emulator and waiting for boot to complete...."
+          ls -la $ANDROID_HOME/emulator
+          nohup $ANDROID_HOME/tools/emulator -avd TestAvd -gpu host -no-audio -no-boot-anim -camera-back none -camera-front none -qemu -m 2048 2>&1 &
+          $ANDROID_HOME/platform-tools/adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed | tr -d '\r') ]]; do echo "wait..."; sleep 1; done; input keyevent 82'
+          echo "Emulator has finished booting"
+          $ANDROID_HOME/platform-tools/adb devices
+          sleep 30
+          screencapture screenshot.jpg
+          $ANDROID_HOME/platform-tools/adb exec-out screencap -p > emulator.png
+
+      - name: Disable animations
+        run: |
+          adb shell settings put global window_animation_scale 0 &
+          adb shell settings put global transition_animation_scale 0 &
+          adb shell settings put global animator_duration_scale 0 &
