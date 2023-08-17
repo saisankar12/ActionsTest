@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">ActionsTest</string>
+    <string-array name="names">
+        <item>Select Department</item>
+        <item>CSE</item>
+        <item>ECE</item>
+        <item>IT</item>
+        <item>MECH</item>
+
+    </string-array>
 </resources>

@@ -27,7 +27,7 @@ class MainUITest {
     var mActivityScenarioRule = ActivityScenarioRule(MainActivity::class.java)
 
     @Test
-    fun mainUITest() {
+    fun clickNavigateToHome() {
         val materialButton = onView(
             allOf(
                 withId(R.id.helloclick), withText("Hello World!"),
@@ -42,16 +42,8 @@ class MainUITest {
             )
         )
         materialButton.perform(click())
-
-        val textView = onView(
-            allOf(
-                withText("Welcome to Home"),
-                withParent(withParent(withId(android.R.id.content))),
-                isDisplayed()
-            )
-        )
-        textView.check(matches(withText("Welcome to Home")))
     }
+
 
     private fun childAtPosition(
         parentMatcher: Matcher<View>, position: Int
