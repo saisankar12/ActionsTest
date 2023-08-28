@@ -20,4 +20,9 @@ class MainActivityTest {
     fun sub() {
         assertEquals(0, 2-2)
     }
+
+    @Test
+    fun divide() {
+        assertEquals(4, 24*6)
+    }
 }

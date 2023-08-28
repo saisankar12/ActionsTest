@@ -1,8 +1,9 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("org.sonarqube") version "4.2.1.3168"
 }
-
+//sqp_720140b94566dc8607650e1f9ee1dca97281db95
 android {
     namespace = "com.example.actionstest"
     compileSdk = 33
@@ -13,7 +14,6 @@ android {
         targetSdk = 33
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 

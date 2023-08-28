@@ -11,7 +11,6 @@ class CalculationTest {
     @Test
     fun addition_isCorrect() {
         assertEquals(5, Calculation().addTwoNumbers(2, 3))
-        //assertEquals(4,2+2)
     }
 
 
