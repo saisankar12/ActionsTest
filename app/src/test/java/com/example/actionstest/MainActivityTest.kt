@@ -23,6 +23,6 @@ class MainActivityTest {
 
     @Test
     fun divide() {
-        assertEquals(4, 24*6)
+        assertEquals(4, 24/6)
     }
 }

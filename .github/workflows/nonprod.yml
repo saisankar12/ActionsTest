@@ -194,6 +194,7 @@ jobs:
   sonarqube:
     name: SonarQube Trigger
     runs-on: ubuntu-latest
+    needs: ui-tests
     steps:
       - name: Checking out
         uses: actions/checkout@master
